@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PhishGuard</title>
+
+<style>
+body {
+  background: #080b10;
+  color: #dde5f0;
+  font-family: Arial;
+  text-align: center;
+  padding: 40px;
+}
+
+input {
+  padding: 12px;
+  width: 350px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #00e5ff;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+/* Loader */
+.loader {
+  display: none;
+  margin-top: 20px;
+}
+
+.spinner {
+  border: 4px solid #1a1f2b;
+  border-top: 4px solid #00e5ff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.result-box {
+  margin-top: 30px;
+  background: #131820;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.safe { color: #00e5a0; }
+.suspicious { color: orange; }
+.malicious { color: #ff4466; }
+
+ul {
+  text-align: left;
+  max-width: 600px;
+  margin: auto;
+}
+
+.explain {
+  font-size: 13px;
+  color: #6b7a90;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🔐 PhishGuard</h1>
+<p>Analyze suspicious URLs instantly</p>
+
+<form method="POST" action="/scan" onsubmit="showLoader()">
+  <input type="text" name="url" placeholder="Enter URL" required>
+  <br><br>
+  <button type="submit">Analyze Link</button>
+</form>
+
+<!-- Loader -->
+<div class="loader" id="loader">
+  <div class="spinner"></div>
+  <p>Analyzing URL...</p>
+</div>
+
+{% if result %}
+<div class="result-box">
+
+  <h2 class="{{ result.verdict | lower }}">
+    {{ result.verdict }}
+  </h2>
+
+  <h3>Score: {{ result.score }}</h3>
+
+  <p><b>URL:</b> {{ result.url }}</p>
+
+  <h4>Threat Indicators:</h4>
+  <ul>
+    {% for r in result.reasons %}
+      <li>
+        <b>{{ r }}</b>
+        <div class="explain">
+          {% if "HTTPS" in r %}
+            This site is not encrypted and can be intercepted.
+          {% elif "IP address" in r %}
+            IP-based URLs are commonly used in phishing.
+          {% elif "keywords" in r %}
+            Urgent or sensitive keywords are used in scams.
+          {% elif "domain" in r %}
+            Newly registered domains are often used in attacks.
+          {% elif "Connection" in r %}
+            Server behavior is suspicious or restricted.
+          {% else %}
+            This pattern is commonly linked to phishing activity.
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
+</div>
+{% endif %}
+
+<!-- HOW IT WORKS -->
+<div style="margin-top:60px; max-width:800px; margin-left:auto; margin-right:auto; text-align:left;">
+
+  <h2 style="text-align:center;">⚙️ How PhishGuard Works</h2>
+
+  <div style="margin-top:20px; line-height:1.7; color:#6b7a90;">
+
+    <p>
+      PhishGuard analyzes URLs using a set of security heuristics to detect potential phishing or malicious patterns.
+      Instead of visiting the website, it evaluates the structure and metadata of the URL to ensure safe analysis.
+    </p>
+
+    <h3 style="color:#00e5ff; margin-top:20px;">🔍 Step-by-Step Analysis</h3>
+
+    <ul>
+      <li><b>1. URL Parsing:</b> Breaks the URL into domain, subdomain, and path for inspection.</li>
+
+      <li><b>2. HTTPS Check:</b> Verifies if the website uses secure encryption.</li>
+
+      <li><b>3. Keyword Detection:</b> Looks for phishing-related words like "login", "verify", or "bank".</li>
+
+      <li><b>4. Domain Analysis:</b> Checks if the domain looks random or newly created.</li>
+
+      <li><b>5. WHOIS Lookup:</b> Determines domain age — newer domains are higher risk.</li>
+
+      <li><b>6. Server Behavior:</b> Sends a request to check response reliability.</li>
+
+    </ul>
+
+    <h3 style="color:#00e5ff; margin-top:20px;">📊 Risk Scoring</h3>
+
+    <p>
+      Each suspicious signal adds to a risk score (0–100). Based on this:
+    </p>
+
+    <ul>
+      <li><b>0–29:</b> Safe ✅</li>
+      <li><b>30–59:</b> Suspicious ⚠️</li>
+      <li><b>60+:</b> Malicious ❌</li>
+    </ul>
+
+    <h3 style="color:#00e5ff; margin-top:20px;">⚠️ Important Note</h3>
+
+    <p>
+      This tool uses heuristic analysis and does not guarantee 100% accuracy.
+      Always verify suspicious links manually and avoid entering sensitive information on unknown websites.
+    </p>
+
+  </div>
+</div>
+
+<script>
+function showLoader() {
+  document.getElementById("loader").style.display = "block";
+}
+</script>
+
+</body>
+</html>
