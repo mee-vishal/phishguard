@@ -4,11 +4,6 @@ PhishGuard is a web-based cybersecurity tool that analyzes URLs to detect potent
 
 ---
 
-## 🚀 Live Demo
-👉 https://your-app-name.onrender.com  
-*(Replace with your deployed link)*
-
----
 
 ## 📌 Features
 
